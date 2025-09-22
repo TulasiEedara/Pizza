@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Pizza Place</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f7fafc;
+        }
+
+        /* Custom message box styles */
+        .message-box {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: opacity 0.3s ease-in-out;
+            opacity: 0;
+            visibility: hidden;
+            text-align: center;
+        }
+        .message-box.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .message-box.success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .message-box.error {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s linear;
+        }
+        .modal.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s ease-in-out;
+        }
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden text-gray-800">
+
+    <!-- Message Box Element -->
+    <div id="message-box" class="message-box"></div>
+
+    <!-- Order Modal -->
+    <div id="order-modal" class="modal">
+        <div class="modal-content w-full md:w-1/2 lg:w-1/3">
+            <button id="close-modal-button" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors duration-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h2 class="text-3xl font-bold text-center text-red-600 mb-6">Place Your Order</h2>
+            <form id="order-form" class="space-y-6">
+                <div>
+                    <label for="order-name" class="block text-gray-700 font-semibold mb-2">Name</label>
+                    <input type="text" id="order-name" name="name" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500" required>
+                </div>
+                <div>
+                    <label for="order-phone" class="block text-gray-700 font-semibold mb-2">Phone</label>
+                    <input type="tel" id="order-phone" name="phone" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500" required>
+                </div>
+                <div>
+                    <label for="order-address" class="block text-gray-700 font-semibold mb-2">Delivery Address</label>
+                    <textarea id="order-address" name="address" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500" required></textarea>
+                </div>
+                <div>
+                    <label for="order-details" class="block text-gray-700 font-semibold mb-2">Order Details</label>
+                    <textarea id="order-details" name="details" rows="5" placeholder="e.g., 1 large Pepperoni Pizza, 1 small Veggie Pizza" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500" required></textarea>
+                </div>
+                <button type="submit" class="w-full bg-red-600 text-white px-6 py-3 rounded-full font-bold hover:bg-red-700 transition-colors duration-300 shadow-lg">Confirm Order</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Header & Navigation -->
+    <header class="bg-white shadow-lg sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-3xl font-bold text-red-600">The Pizza Place</a>
+            
+            <!-- Desktop Nav -->
+            <ul class="hidden md:flex space-x-8 items-center">
+                <li><a href="#menu" class="text-gray-600 hover:text-red-500 transition-colors duration-300 font-medium">Menu</a></li>
+                <li><a href="#specials" class="text-gray-600 hover:text-red-500 transition-colors duration-300 font-medium">Specials</a></li>
+                <li><a href="#contact" class="text-gray-600 hover:text-red-500 transition-colors duration-300 font-medium">Contact</a></li>
+                <li><button id="desktop-order-button" class="bg-red-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-red-700 transition-colors duration-300 shadow-md">Order Now</button></li>
+            </ul>
+
+            <!-- Mobile Nav Button -->
+            <button id="mobile-menu-button" class="md:hidden text-gray-800 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+        </nav>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-inner pb-4">
+            <ul class="flex flex-col items-center space-y-4">
+                <li><a href="#menu" class="text-gray-600 hover:text-red-500 transition-colors duration-300 font-medium">Menu</a></li>
+                <li><a href="#specials" class="text-gray-600 hover:text-red-500 transition-colors duration-300 font-medium">Specials</a></li>
+                <li><a href="#contact" class="text-gray-600 hover:text-red-500 transition-colors duration-300 font-medium">Contact</a></li>
+                <li><button id="mobile-order-button" class="bg-red-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-red-700 transition-colors duration-300 shadow-md w-max">Order Now</button></li>
+            </ul>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="bg-red-500 bg-opacity-10 py-20 px-6 sm:px-12 md:px-24 flex flex-col md:flex-row items-center justify-between">
+            <div class="md:w-1/2 text-center md:text-left mb-10 md:mb-0">
+                <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-800 leading-tight">
+                    Every Slice Tells a Story.
+                </h1>
+                <p class="mt-4 text-lg md:text-xl text-gray-600 max-w-lg mx-auto md:mx-0">
+                    Discover our authentic, hand-tossed pizzas made with the freshest ingredients and a whole lot of love.
+                </p>
+                <button id="hero-order-button" class="mt-8 inline-block bg-red-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-red-700 transition-colors duration-300 shadow-xl">
+                    Order a Pizza!
+                </button>
+            </div>
+            <div class="md:w-1/2 flex justify-center">
+                <img src="https://placehold.co/500x500/ff4d4d/fff?text=Delicious+Pizza" alt="Delicious Pizza" class="rounded-full shadow-2xl transition-transform duration-500 hover:scale-105">
+            </div>
+        </section>
+
+        <!-- Menu Section -->
+        <section id="menu" class="py-20 px-6 sm:px-12 md:px-24">
+            <div class="container mx-auto">
+                <h2 class="text-4xl font-bold text-center text-gray-800 mb-4">Our Menu</h2>
+                <p class="text-center text-gray-600 text-lg mb-12 max-w-2xl mx-auto">Explore our delicious range of pizzas, from classic favorites to our signature creations.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <!-- Pizza Card 1: Pepperoni -->
+                    <div class="bg-white rounded-3xl shadow-xl overflow-hidden transition-transform duration-300 hover:scale-105">
+                        <img src="https://placehold.co/600x400/fecaca/fff?text=Pepperoni" alt="Pepperoni Pizza" class="w-full h-64 object-cover">
+                        <div class="p-8">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Classic Pepperoni</h3>
+                            <p class="text-gray-600">A timeless favorite with rich tomato sauce, mozzarella cheese, and generous slices of pepperoni.</p>
+                            <p class="mt-4 text-xl font-bold text-red-600">$14.99</p>
+                            <button class="mt-4 inline-block bg-red-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-red-700 transition-colors duration-300 order-button">Add to Order</button>
+                        </div>
+                    </div>
+                    <!-- Pizza Card 2: Margherita -->
+                    <div class="bg-white rounded-3xl shadow-xl overflow-hidden transition-transform duration-300 hover:scale-105">
+                        <img src="https://placehold.co/600x400/fecaca/fff?text=Margherita" alt="Margherita Pizza" class="w-full h-64 object-cover">
+                        <div class="p-8">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Margherita</h3>
+                            <p class="text-gray-600">Simple perfection: fresh mozzarella, basil, and our special tomato sauce.</p>
+                            <p class="mt-4 text-xl font-bold text-red-600">$12.99</p>
+                            <button class="mt-4 inline-block bg-red-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-red-700 transition-colors duration-300 order-button">Add to Order</button>
+                        </div>
+                    </div>
+                    <!-- Pizza Card 3: Veggie Supreme -->
+                    <div class="bg-white rounded-3xl shadow-xl overflow-hidden transition-transform duration-300 hover:scale-105">
+                        <img src="https://placehold.co/600x400/fecaca/fff?text=Veggie" alt="Veggie Supreme Pizza" class="w-full h-64 object-cover">
+                        <div class="p-8">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Veggie Supreme</h3>
+                            <p class="text-gray-600">A garden of fresh toppings: bell peppers, onions, mushrooms, and olives.</p>
+                            <p class="mt-4 text-xl font-bold text-red-600">$15.99</p>
+                            <button class="mt-4 inline-block bg-red-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-red-700 transition-colors duration-300 order-button">Add to Order</button>
+                        </div>
+                    </div>
+                    <!-- Add more pizza cards here as needed -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Specials Section -->
+        <section id="specials" class="py-20 px-6 sm:px-12 md:px-24 bg-red-500 bg-opacity-10">
+            <div class="container mx-auto text-center">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">Today's Specials</h2>
+                <p class="text-gray-600 text-lg mb-12 max-w-2xl mx-auto">Don't miss out on our limited-time offers and incredible deals!</p>
+                <div class="bg-white p-8 rounded-3xl shadow-xl max-w-2xl mx-auto">
+                    <img src="https://placehold.co/600x400/ff4d4d/fff?text=Special+Offer" alt="Special Offer" class="rounded-2xl w-full h-auto object-cover mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Family Feast Deal</h3>
+                    <p class="text-gray-600 mb-4">Get two large pizzas, a side of garlic bread, and a 2-liter soda for just **$29.99**.</p>
+                    <button class="bg-red-600 text-white px-8 py-4 rounded-full font-bold hover:bg-red-700 transition-colors duration-300 order-button">Claim This Deal</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Contact Section -->
+        <section id="contact" class="py-20 px-6 sm:px-12 md:px-24">
+            <div class="container mx-auto">
+                <h2 class="text-4xl font-bold text-center text-gray-800 mb-4">Contact Us</h2>
+                <p class="text-center text-gray-600 text-lg mb-12 max-w-2xl mx-auto">Have a question or a special request? Send us a message!</p>
+                
+                <div class="flex flex-col lg:flex-row gap-12 items-center">
+                    <!-- Contact Form -->
+                    <div class="w-full lg:w-1/2 bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
+                        <form id="contact-form" class="space-y-6">
+                            <div>
+                                <label for="name" class="block text-gray-700 font-semibold mb-2">Name</label>
+                                <input type="text" id="name" name="name" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500" required>
+                            </div>
+                            <div>
+                                <label for="email" class="block text-gray-700 font-semibold mb-2">Email</label>
+                                <input type="email" id="email" name="email" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500" required>
+                            </div>
+                            <div>
+                                <label for="message" class="block text-gray-700 font-semibold mb-2">Message</label>
+                                <textarea id="message" name="message" rows="5" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500" required></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-red-600 text-white px-6 py-3 rounded-full font-bold hover:bg-red-700 transition-colors duration-300 shadow-lg">Send Message</button>
+                        </form>
+                    </div>
+
+                    <!-- Map Section -->
+                    <div class="w-full lg:w-1/2">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15657.485121233842!2d76.99042335199852!3d11.011685934149021!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba859a0f0234a9f%3A0x6b74404618e87491!2sThe%20Pizza%20Place!5e0!3m2!1sen!2sin!4v1716102143431!5m2!1sen!2sin"
+                            width="100%"
+                            height="450"
+                            style="border:0;"
+                            allowfullscreen=""
+                            loading="lazy"
+                            class="rounded-3xl shadow-xl"
+                        ></iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12 px-6 sm:px-12 md:px-24">
+        <div class="container mx-auto text-center">
+            <p class="text-lg font-semibold mb-2">The Pizza Place</p>
+            <p class="text-sm text-gray-400 mb-4">123 Pizza Street, Flavor Town, 12345</p>
+            <div class="space-x-4">
+                <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Facebook</a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Instagram</a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Twitter</a>
+            </div>
+            <p class="mt-8 text-sm text-gray-500">&copy; 2024 The Pizza Place. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // JavaScript for mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Function to show a message box (instead of alert)
+        function showMessage(message, type) {
+            const msgBox = document.getElementById('message-box');
+            msgBox.textContent = message;
+            msgBox.className = `message-box show ${type}`;
+            setTimeout(() => {
+                msgBox.className = `message-box ${type}`;
+            }, 3000);
+        }
+
+        // --- Order Modal Logic ---
+        const orderModal = document.getElementById('order-modal');
+        const openModalButtons = document.querySelectorAll('#desktop-order-button, #mobile-order-button, #hero-order-button, .order-button');
+        const closeModalButton = document.getElementById('close-modal-button');
+        const orderForm = document.getElementById('order-form');
+
+        openModalButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                event.preventDefault();
+                orderModal.classList.add('show');
+            });
+        });
+
+        closeModalButton.addEventListener('click', () => {
+            orderModal.classList.remove('show');
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === orderModal) {
+                orderModal.classList.remove('show');
+            }
+        });
+
+        orderForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            showMessage('Order placed! We will contact you to confirm delivery details.', 'success');
+            orderModal.classList.remove('show');
+            orderForm.reset();
+        });
+
+        // --- Contact Form Logic ---
+        const contactForm = document.getElementById('contact-form');
+        contactForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            console.log('Contact form submitted!');
+            showMessage('Thank you for your message! We will get back to you soon.', 'success');
+            contactForm.reset();
+        });
+    </script>
+
+</body>
+</html>
